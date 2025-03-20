@@ -38,10 +38,6 @@ import inspect
 from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
-from qgis.core import (
-    QgsMessageLog,
-    QgsGeometry,
-)
 
 from qgis.PyQt.QtWidgets import (
     QMessageBox,
@@ -91,6 +87,7 @@ from .layerRename_algorithm import layerRenameAlgorithm
 from .getVersion_algorithm import getVersionAlgorithm
 from .runCom1DFA_algorithm import runCom1DFAAlgorithm
 from .runCom2AB_algorithm import runCom2ABAlgorithm
+from .runCom9MoTVoellmy_algorithm import runCom9MoTVoellmyAlgorithm
 from .runAna4ProbAna_algorithm import runAna4ProbAnaAlgorithm
 from .runAna4ProbDirOnly_algorithm import runAna4ProbDirOnlyAlgorithm
 from .runAna5DFAPathGeneration_algorithm import runAna5DFAPathGenerationAlgorithm
@@ -132,6 +129,8 @@ class AvaFrameConnectorProvider(QgsProcessingProvider):
         self.addAlgorithm(runCom5SnowSlideAlgorithm())
         self.addAlgorithm(runCom6RockAvalancheAlgorithm())
         self.addAlgorithm(runCom6ScarpAlgorithm())
+        # self.addAlgorithm(runCom8MoTPSAAlgorithm())
+        self.addAlgorithm(runCom9MoTVoellmyAlgorithm())
         self.addAlgorithm(runCom7RegionalSplittingAlgorithm())
         self.addAlgorithm(runCom7RegionalComputationAlgorithm())
         self.addAlgorithm(runAna4ProbAnaAlgorithm())
