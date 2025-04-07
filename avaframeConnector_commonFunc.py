@@ -173,6 +173,40 @@ def getDFAPathResults(targetDir):
 
     return allDFAPathLayers
 
+def getCom6ScarpResults(targetDir):
+    """Get results of com6 scarp analysis
+
+    Parameters
+    -----------
+    targetDir: pathlib path
+        to avalanche directory
+    Returns
+    -------
+
+    """
+    from qgis.core import QgsRasterLayer
+
+    avaDir = pathlib.Path(str(targetDir))
+    scarpResultsDir = avaDir / "Outputs" / "com6RockAvalanche" / "scarp"
+    print("--------------")
+    print(scarpResultsDir)
+
+    globbed = list(scarpResultsDir.glob("*.asc")) + list(scarpResultsDir.glob("*.tif"))
+    scriptDir = pathlib.Path(__file__).parent
+    qml = str(scriptDir / "QGisStyles" / "probMap.qml")
+
+    allRasterLayers = list()
+    for item in globbed:
+        rstLayer = QgsRasterLayer(str(item), item.stem)
+        # try:
+        #     rstLayer.loadNamedStyle(qml)
+        # except:
+        #     pass
+
+        allRasterLayers.append(rstLayer)
+
+    return allRasterLayers
+
 def getAna4ProbAnaResults(targetDir):
     """Get results of ana4PropAna
 
