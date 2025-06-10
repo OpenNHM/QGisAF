@@ -143,14 +143,14 @@ class AvaFrameConnectorProvider(QgsProcessingProvider):
         string should be a unique, short, character only string, eg "qgis" or
         "gdal". This string should not be localised.
         """
-        return "AVAFRAME"
+        return "OpenNHM"
 
     def name(self):
         """
         Returns the provider name, which is used to describe the provider
         within the GUI.
         """
-        return self.tr("AVAFRAME")
+        return self.tr("OpenNHM")
 
     def icon(self):
         """
