@@ -4,9 +4,9 @@
 
 [general]
 name=AvaFrameConnector
-qgisMinimumVersion=3.18
+qgisMinimumVersion=3.22
 description=Connects to AvaFrame
-version=1.12.1
+version=1.13
 author=AvaFrame Team
 email=felix@avaframe.org
 
@@ -24,7 +24,8 @@ repository=https://github.com/OpenNHM/QGisAF
 
 hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
-changelog= 1.12.1 Remove numpy update on installation
+changelog= 1.13 Add Scarp (com6) analysis tool
+    1.12.1 Remove numpy update on installation
     1.12 On Release area statics run, open parent folder on completion
     1.10 Add path generation tool, accept geotiff as raster input
     1.9 Add small ava to com2AB, fix deletion runOperational
