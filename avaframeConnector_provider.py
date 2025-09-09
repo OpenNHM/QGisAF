@@ -91,12 +91,14 @@ from .layerRename_algorithm import layerRenameAlgorithm
 from .getVersion_algorithm import getVersionAlgorithm
 from .runCom1DFA_algorithm import runCom1DFAAlgorithm
 from .runCom2AB_algorithm import runCom2ABAlgorithm
-from .runCom5SnowSlide_algorithm import runCom5SnowSlideAlgorithm
-from .runCom6RockAvalanche_algorithm import runCom6RockAvalancheAlgorithm
-from .runCom6Scarp_algorithm import runCom6ScarpAlgorithm
 from .runAna4ProbAna_algorithm import runAna4ProbAnaAlgorithm
 from .runAna4ProbDirOnly_algorithm import runAna4ProbDirOnlyAlgorithm
 from .runAna5DFAPathGeneration_algorithm import runAna5DFAPathGenerationAlgorithm
+from .runCom5SnowSlide_algorithm import runCom5SnowSlideAlgorithm
+from .runCom6RockAvalanche_algorithm import runCom6RockAvalancheAlgorithm
+from .runCom7RegionalSplitting_algorithm import runCom7RegionalSplittingAlgorithm
+from .runCom7RegionalComputation_algorithm import runCom7RegionalComputationAlgorithm
+from .runCom6Scarp_algorithm import runCom6ScarpAlgorithm
 from .runIn1RelInfo_algorithm import runIn1RelInfoAlgorithm
 from .update_algorithm import updateAlgorithm
 
@@ -130,6 +132,8 @@ class AvaFrameConnectorProvider(QgsProcessingProvider):
         self.addAlgorithm(runCom5SnowSlideAlgorithm())
         self.addAlgorithm(runCom6RockAvalancheAlgorithm())
         self.addAlgorithm(runCom6ScarpAlgorithm())
+        self.addAlgorithm(runCom7RegionalSplittingAlgorithm())
+        self.addAlgorithm(runCom7RegionalComputationAlgorithm())
         self.addAlgorithm(runAna4ProbAnaAlgorithm())
         self.addAlgorithm(runAna4ProbDirOnlyAlgorithm())
         self.addAlgorithm(runAna5DFAPathGenerationAlgorithm())
