@@ -87,6 +87,39 @@ def getSHPParts(base):
     return globbed
 
 
+def getCom7PeakResults(targetDir):
+    """
+    Retrieve peak results for the com7Regional computation from the specified target directory.
+
+    Parameters:
+    ------
+    targetDir: pathlib.Path
+        The path to the directory containing com7 analysis files.
+
+    Returns:
+    ------
+    peakRasters:
+        A list of dictionaries containing peak result data extracted
+              from the analysis files.
+    """
+
+    targetDir = pathlib.Path(targetDir)
+    targetDir = targetDir / "com7Regional"
+
+    subAvaDirs = fU.findAvaDirsBasedOnInputsDir(targetDir)
+
+    allPeakRasters = []
+    for avaDir in subAvaDirs:
+        peakRasters = getLatestPeak(avaDir)
+        allPeakRasters.append(peakRasters)
+
+    allPeakDF = pd.concat(
+        allPeakRasters,
+        ignore_index=True,
+    )
+    return allPeakDF
+
+
 def getLatestPeak(targetDir):
     """Get latest peakFiles of com1DFA results
 
@@ -141,37 +174,40 @@ def getAlphaBetaResults(targetDir, useSmallAva=False):
         abResultsLayer = QgsVectorLayer(str(abResultsFile), "AlphaBeta (com2)", "ogr")
         return abResultsLayer
     else:
-        return 'None'
+        return "None"
+
 
 def getDFAPathResults(targetDir):
-    '''Get results from path generation
+    """Get results from path generation
 
-        Parameters
-        -----------
-        targetDir: pathlib path
-            to avalanche directory
-        Returns
-        -------
-        DFAPathResults : massAvgPath and splitPoint
-    '''
-    from qgis.core import (QgsVectorLayer)
+    Parameters
+    -----------
+    targetDir: pathlib path
+        to avalanche directory
+    Returns
+    -------
+    DFAPathResults : massAvgPath and splitPoint
+    """
+    from qgis.core import QgsVectorLayer
+
     avaDir = pathlib.Path(str(targetDir))
-    pathDir = avaDir / 'Outputs' / 'ana5Utils' / 'DFAPath'
+    pathDir = avaDir / "Outputs" / "ana5Utils" / "DFAPath"
     allDFAPathLayers = []
 
     # Collect all path shapefiles
-    for file in pathDir.glob('massAvgPath*.shp'):
+    for file in pathDir.glob("massAvgPath*.shp"):
         pathLayer = QgsVectorLayer(str(file), f"Mass Average Path - {file.stem}", "ogr")
         if pathLayer.isValid():
             allDFAPathLayers.append(pathLayer)
 
     # Collect all split point shapefiles
-    for file in pathDir.glob('splitPointParabolicFit*.shp'):
+    for file in pathDir.glob("splitPointParabolicFit*.shp"):
         splitPointLayer = QgsVectorLayer(str(file), f"Split Point - {file.stem}", "ogr")
         if splitPointLayer.isValid():
             allDFAPathLayers.append(splitPointLayer)
 
     return allDFAPathLayers
+
 
 def getCom6ScarpResults(targetDir):
     """Get results of com6 scarp analysis
@@ -207,6 +243,7 @@ def getCom6ScarpResults(targetDir):
 
     return allRasterLayers
 
+
 def getAna4ProbAnaResults(targetDir):
     """Get results of ana4PropAna
 
@@ -223,7 +260,9 @@ def getAna4ProbAnaResults(targetDir):
     avaDir = pathlib.Path(str(targetDir))
     ana4ResultsDir = avaDir / "Outputs" / "ana4Stats"
 
-    globbed = list(ana4ResultsDir.glob(avaDir.stem + "*.asc")) + list(ana4ResultsDir.glob(avaDir.stem + "*.tif"))
+    globbed = list(ana4ResultsDir.glob(avaDir.stem + "*.asc")) + list(
+        ana4ResultsDir.glob(avaDir.stem + "*.tif")
+    )
     scriptDir = pathlib.Path(__file__).parent
     qml = str(scriptDir / "QGisStyles" / "probMap.qml")
 
@@ -298,7 +337,9 @@ def addLayersToContext(context, layers, outTarget):
         context.addLayerToLoadOnCompletion(
             item.id(),
             QgsProcessingContext.LayerDetails(
-                item.name(), context.project(), outTarget
+                name=item.name(),
+                project=context.project(),
+                outputName=outTarget,
             ),
         )
 
@@ -457,9 +498,8 @@ def runAndCheck(command, self, feedback):
                 printCounter = printCounter + 1
                 if printCounter > 100:
                     # print('\r' + line, flush=True, end='')
-                    msg = (
-                            "Process is running. Reported time steps (all sims): "
-                            + str(counter)
+                    msg = "Process is running. Reported time steps (all sims): " + str(
+                        counter
                     )
                     feedback.pushInfo(msg)
                     printCounter = 0

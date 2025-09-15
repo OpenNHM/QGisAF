@@ -38,10 +38,6 @@ import inspect
 from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
-from qgis.core import (
-    QgsMessageLog,
-    QgsGeometry,
-)
 
 from qgis.PyQt.QtWidgets import (
     QMessageBox,
@@ -101,6 +97,7 @@ from .runCom7RegionalComputation_algorithm import runCom7RegionalComputationAlgo
 from .runCom6Scarp_algorithm import runCom6ScarpAlgorithm
 from .runIn1RelInfo_algorithm import runIn1RelInfoAlgorithm
 from .update_algorithm import updateAlgorithm
+from .loadCom7Results_algorithm import loadCom7ResultsAlgorithm
 
 
 class AvaFrameConnectorProvider(QgsProcessingProvider):
@@ -139,6 +136,7 @@ class AvaFrameConnectorProvider(QgsProcessingProvider):
         self.addAlgorithm(runAna5DFAPathGenerationAlgorithm())
         self.addAlgorithm(getVersionAlgorithm())
         self.addAlgorithm(updateAlgorithm())
+        self.addAlgorithm(loadCom7ResultsAlgorithm())
         self.addAlgorithm(runIn1RelInfoAlgorithm())
 
     def id(self):
