@@ -6,7 +6,7 @@
 name=AvaFrameConnector
 qgisMinimumVersion=3.22
 description=Connects to AvaFrame
-version=1.13
+version=1.14
 author=AvaFrame Team
 email=felix@avaframe.org
 
@@ -24,7 +24,8 @@ repository=https://github.com/OpenNHM/QGisAF
 
 hasProcessingProvider=yes
 # Uncomment the following line and add your changelog:
-changelog= 1.13 Add Scarp (com6) analysis tool
+changelog= 1.14 Add experimental MoT Voellmy (com9); com7 Regional
+    1.13 Add Scarp (com6) analysis tool
     1.12.1 Remove numpy update on installation
     1.12 On Release area statics run, open parent folder on completion
     1.10 Add path generation tool, accept geotiff as raster input
