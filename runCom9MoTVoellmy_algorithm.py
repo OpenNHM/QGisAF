@@ -356,7 +356,7 @@ class runCom9MoTVoellmyAlgorithm(QgsProcessingAlgorithm):
             cF.copyRaster(sourceTAUC, targetDir / "Inputs" / "RASTERS", "_tauc")
 
         if sourceND is not None:
-            cF.copyRaster(sourceND, targetDir / "Inputs" / "RASTERS", "_nd")
+            cF.copyRaster(sourceND, targetDir / "Inputs" / "RES", "_nd")
 
         if sourceBHD is not None:
             cF.copyRaster(sourceBHD, targetDir / "Inputs" / "RASTERS", "_bhd")
