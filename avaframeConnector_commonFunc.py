@@ -53,6 +53,23 @@ def copyRaster(raster, targetDir, suffix):
         pass
 
 
+def copyMultipleRaster(rasterDict, targetDir, suffix):
+    """copies multiple raster files to targetDir with suffix added to filenames
+
+    Parameters
+    -----------
+    rasterDict:
+        dict with multiple qgis raster layers
+    targetDir: pathlib.Path
+        target directory
+    suffix: string
+        suffix to add to filename (e.g., "_mu", "_k")
+    """
+    for raster in rasterDict:
+        print("RAAAAAAAAASTER:", raster)
+        copyRaster(raster, targetDir, suffix)
+
+
 def copyMultipleShp(sourceDict, targetPath, addToName=""):
     """copies multiple shapefile parts to targetPath
 

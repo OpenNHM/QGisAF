@@ -8,8 +8,6 @@ __copyright__ = "(C) 2022 by AvaFrame Team"
 
 __revision__ = "$Format:%H$"
 
-import subprocess
-from pathlib import Path
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
@@ -18,7 +16,6 @@ from qgis.core import (
     QgsProcessingAlgorithm,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterRasterLayer,
-    QgsProcessingParameterEnum,
     QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterFolderDestination,
     QgsProcessingOutputVectorLayer,
@@ -34,8 +31,6 @@ class runCom6RockAvalancheAlgorithm(QgsProcessingAlgorithm):
 
     DEM = "DEM"
     REL = "REL"
-    RELTH = "RELTH"
-    SECREL = "SECREL"
     ENT = "ENT"
     RES = "RES"
     OUTPUT = "OUTPUT"
@@ -50,30 +45,17 @@ class runCom6RockAvalancheAlgorithm(QgsProcessingAlgorithm):
         """
 
         self.addParameter(
-            QgsProcessingParameterRasterLayer(self.DEM, self.tr("DEM layer"))
+            QgsProcessingParameterRasterLayer(
+                self.DEM, self.tr("DEM layer (e.g. elevation tif from Scarp (com6)")
+            )
         )
 
         self.addParameter(
             QgsProcessingParameterMultipleLayers(
                 self.REL,
-                self.tr("Release layer(s)"),
-                layerType=QgsProcessing.TypeVectorAnyGeometry,
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
-                self.RELTH, self.tr("Release thickness layer")
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterFeatureSource(
-                self.SECREL,
-                self.tr("Secondary release layer (only one is allowed)"),
-                optional=True,
+                self.tr("Release layer(s) (e.g. HRel tif from Scarp (com6))"),
+                layerType=QgsProcessing.TypeRaster,
                 defaultValue="",
-                types=[QgsProcessing.TypeVectorAnyGeometry],
             )
         )
 
@@ -137,8 +119,6 @@ class runCom6RockAvalancheAlgorithm(QgsProcessingAlgorithm):
         if sourceDEM is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.DEM))
 
-        sourceRELTH = self.parameterAsRasterLayer(parameters, self.RELTH, context)
-
         # Release files
         allREL = self.parameterAsLayerList(parameters, self.REL, context)
         if allREL is None:
@@ -147,12 +127,6 @@ class runCom6RockAvalancheAlgorithm(QgsProcessingAlgorithm):
         relDict = {}
         if allREL:
             relDict = {lyr.source(): lyr for lyr in allREL}
-
-        # Secondary release files
-        sourceSecREL = self.parameterAsVectorLayer(parameters, self.SECREL, context)
-        if sourceSecREL is not None:
-            srInfo = "_sec" + Path(sourceSecREL.source()).stem
-            targetADDTONAME = targetADDTONAME + srInfo
 
         sourceENT = self.parameterAsVectorLayer(parameters, self.ENT, context)
 
@@ -169,14 +143,11 @@ class runCom6RockAvalancheAlgorithm(QgsProcessingAlgorithm):
         cF.copyDEM(sourceDEM, targetDir)
 
         # copy all release shapefile parts
-        cF.copyMultipleShp(relDict, targetDir / "Inputs" / "REL", targetADDTONAME)
 
-        # copy all secondary release shapefile parts
-        if sourceSecREL is not None:
-            cF.copyShp(sourceSecREL.source(), targetDir / "Inputs" / "SECREL")
-
-        if sourceRELTH is not None:
-            cF.copyShp(sourceRELTH.source(), targetDir / "Inputs" / "RELTH")
+        for source in relDict:
+            cF.copyRaster(relDict[source], targetDir / "Inputs" / "REL", "")
+        # print(relDict)
+        # cF.copyMultipleRaster(relDict, targetDir / "Inputs" / "REL", targetADDTONAME)
 
         # copy all entrainment shapefile parts
         if sourceENT is not None:
@@ -204,7 +175,9 @@ class runCom6RockAvalancheAlgorithm(QgsProcessingAlgorithm):
             rasterResults = cF.getLatestPeak(finalTargetDir)
         except:
             raise QgsProcessingException(
-                self.tr("Something went wrong with com6RockAvalanche, please check log files")
+                self.tr(
+                    "Something went wrong with com6RockAvalanche, please check log files"
+                )
             )
 
         allRasterLayers = cF.addStyleToCom1DFAResults(rasterResults)

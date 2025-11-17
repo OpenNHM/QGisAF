@@ -30,23 +30,17 @@ __copyright__ = "(C) 2025 by AvaFrame Team"
 
 __revision__ = "$Format:%H$"
 
-from pathlib import Path
 
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
     QgsProcessing,
-    QgsRasterLayer,
     QgsProcessingException,
     QgsProcessingAlgorithm,
-    QgsProcessingContext,
     QgsProcessingParameterFeatureSource,
     QgsProcessingParameterRasterLayer,
     QgsProcessingParameterEnum,
-    QgsProcessingParameterMultipleLayers,
     QgsProcessingParameterFolderDestination,
     QgsProcessingOutputVectorLayer,
-    QgsProcessingParameterDefinition,
-    QgsProcessingOutputMultipleLayers,
 )
 
 
@@ -59,6 +53,7 @@ class runCom6ScarpAlgorithm(QgsProcessingAlgorithm):
     DEM = "DEM"
     COORDINATES = "COORDINATES"
     PERIMETER = "PERIMETER"
+    SCARPMETHOD = "SCARPMETHOD"
     OUTPUT = "OUTPUT"
     FOLDEST = "FOLDEST"
 
@@ -68,14 +63,27 @@ class runCom6ScarpAlgorithm(QgsProcessingAlgorithm):
         with some other properties.
         """
 
+        self.addParameter(QgsProcessingParameterRasterLayer(self.DEM, self.tr("DEM layer")))
+
         self.addParameter(
-            QgsProcessingParameterRasterLayer(self.DEM, self.tr("DEM layer"))
+            QgsProcessingParameterEnum(
+                self.SCARPMETHOD,
+                self.tr("Scarp method"),
+                options=[
+                    self.tr("Plane (requires zseed, dip(dir), slopeangle)"),
+                    self.tr(
+                        "Ellipsoid (requires zseed, maxdepth, semimajor, semiminor, tilt, direc, dip(dir), offset"
+                    ),
+                ],
+                defaultValue=0,
+                allowMultiple=False,
+            )
         )
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.COORDINATES,
-                self.tr("Coordinate layer"),
+                self.tr("Coordinate layer (Point shapefile with attributes)"),
                 defaultValue="",
                 types=[QgsProcessing.TypeVectorPoint],
             )
@@ -84,16 +92,15 @@ class runCom6ScarpAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSource(
                 self.PERIMETER,
-                self.tr("Perimeter Layer"),
+                self.tr("Perimeter Layer (Polygon shapefile defining boundary area"),
                 defaultValue="",
                 types=[QgsProcessing.TypeVectorAnyGeometry],
             )
         )
 
+
         self.addParameter(
-            QgsProcessingParameterFolderDestination(
-                self.FOLDEST, self.tr("Destination folder")
-            )
+            QgsProcessingParameterFolderDestination(self.FOLDEST, self.tr("Destination folder"))
         )
 
         self.addOutput(
@@ -121,15 +128,16 @@ class runCom6ScarpAlgorithm(QgsProcessingAlgorithm):
         if sourceDEM is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.DEM))
 
-        sourcePerimeter = self.parameterAsVectorLayer(
-            parameters, self.PERIMETER, context
-        )
+        sourcePerimeter = self.parameterAsVectorLayer(parameters, self.PERIMETER, context)
 
-        sourceCoordinates = self.parameterAsVectorLayer(
-            parameters, self.COORDINATES, context
-        )
+        sourceCoordinates = self.parameterAsVectorLayer(parameters, self.COORDINATES, context)
 
         sourceFOLDEST = self.parameterAsFile(parameters, self.FOLDEST, context)
+
+        # Get the scarp method
+        scarpMethod = self.parameterAsInt(parameters, self.SCARPMETHOD, context)
+        scarpOptions = ["plane", "ellipsoid"]
+        scarpString = scarpOptions[scarpMethod]
 
         finalTargetDir, targetDir = cF.createFolderStructure(sourceFOLDEST)
 
@@ -139,23 +147,25 @@ class runCom6ScarpAlgorithm(QgsProcessingAlgorithm):
 
         cF.copyShp(sourcePerimeter.source(), targetDir / "Inputs" / "POLYGONS", addToName="_perimeter")
 
-        cF.copyShp(sourceCoordinates.source(), targetDir / "Inputs" / "POINTS",addToName="_coordinates")
+        cF.copyShp(sourceCoordinates.source(), targetDir / "Inputs" / "POINTS", addToName="_coordinates")
 
-        feedback.pushInfo('Starting the tool')
-        feedback.pushInfo('This might take a while')
-        feedback.pushInfo('See console for progress')
+        feedback.pushInfo("Starting the tool")
+        feedback.pushInfo("This might take a while")
+        feedback.pushInfo("See console for progress")
         #
-        command = ['python', '-m', 'avaframe.runCom6Scarp', str(targetDir)]
+        command = ["python", "-m", "avaframe.runCom6Scarp", str(targetDir), "-m", scarpString]
         cF.runAndCheck(command, self, feedback)
 
-        feedback.pushInfo('Done, start loading the results')
+        feedback.pushInfo("Done, start loading the results")
 
         cF.moveInputAndOutputFoldersToFinal(targetDir, finalTargetDir)
 
         try:
             allRasterResults = cF.getCom6ScarpResults(finalTargetDir)
         except:
-            raise QgsProcessingException(self.tr('Something went wrong with com6Scarp, please check log files'))
+            raise QgsProcessingException(
+                self.tr("Something went wrong with com6Scarp, please check log files")
+            )
 
         context = cF.addLayersToContext(context, allRasterResults, self.OUTPUT)
 

@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "avaframeconnector"
+description = "QGIS Plugin - Connects to AvaFrame"
+readme = "README.md"
+dynamic = ["version"]
+license = { text = "GPL-2.0-or-later" }
+authors = [
+    { name = "AvaFrame Team", email = "felix@avaframe.org" }
+]
+urls = { Homepage = "http://avaframe.org", Repository = "https://github.com/OpenNHM/QGisAF" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13"
+]
+requires-python = ">=3.9,<3.14"
+
+# Setuptools
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = ["docs*", "tests*"]
+
+[tool.setuptools_scm]
+version_scheme = "no-guess-dev"
+local_scheme = "node-and-date"
+
+# Black
+[tool.black]
+line-length = 109
+
+# PIXI setup
+[tool.pixi.workspace]
+channels = ["https://prefix.dev/conda-forge"]
+platforms = ["linux-64"]
+#platforms = ["linux-64", "win-64", "osx-64"]
+
+[tool.pixi.dependencies]
+python = "<3.14"
+setuptools = "*"
+setuptools-scm = "*"
+
+[tool.pixi.pypi-dependencies]
+pb_tool = "*"
+
+# Feature dev
+[tool.pixi.feature.dev.dependencies]
+qgis = ">=3.22"
+pixi-pycharm = "*"
+black = "*"
+
+[tool.pixi.feature.dev.pypi-dependencies]
+avaframe = { path = "../AvaFrame/", editable = true }
+
+# Feature qgis
+[tool.pixi.feature.qgis.dependencies]
+qgis = ">=3.22"
+
+# Environments
+[tool.pixi.environments]
+default = { features = ["dev"], solve-group = "default" }
+dev = ["dev"]
+qgis = ["qgis", "dev"]
