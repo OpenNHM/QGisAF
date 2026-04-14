@@ -59,11 +59,39 @@ def find_python():
     raise Exception("Python executable not found")
 
 
+# Pin: the connector is only compatible with avaframe < 2.0
+avaFrameSpec = "avaframe<2.0"
+
+def installAvaframe():
+    pythonExe = find_python()
+    subprocess.call(
+        [pythonExe, "-m", "pip", "install", "--user", avaFrameSpec]
+    )
+
+
+def avaframeMajor():
+    from avaframe.version import getVersion
+
+    try:
+        return int(getVersion().split(".")[0])
+    except (ValueError, AttributeError):
+        return None
+
+
 try:
     import avaframe
+
+    _major = avaframeMajor()
+    if _major is not None and _major >= 2:
+        QMessageBox.information(
+            None,
+            "INFO",
+            "AvaFrame >=2.0 detected; the connector requires <2.0. "
+            "Downgrading now — please restart QGIS afterwards.",
+        )
+        installAvaframe()
 except ModuleNotFoundError:
-    # subprocess.call(["pip3", "install", "--upgrade", "--user", "pandas", "numpy"])
-    subprocess.call(["pip3", "install", "avaframe", "--user"])
+    installAvaframe()
     try:
         import avaframe
     except ModuleNotFoundError:
