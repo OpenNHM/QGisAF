@@ -85,11 +85,12 @@ try:
     if _major is not None and _major >= 2:
         QMessageBox.information(
             None,
-            "INFO",
-            "AvaFrame >=2.0 detected; the connector requires <2.0. "
-            "Downgrading now — please restart QGIS afterwards.",
+            "Wrong AvaFrame version",
+            "AvaFrame version >= 2.0 detected. AvaFrameConnector requires AvaFrame < 2.0.\n\n"
+            "Note: AvaFrameConnector cannot be installed at the same time as OpenNHMConnector.\n\n"
+            "To downgrade, run in the OSGeo4W shell (or similar):\n"
+            "    pip install avaframe<2.0",
         )
-        installAvaframe()
 except ModuleNotFoundError:
     installAvaframe()
     try:
